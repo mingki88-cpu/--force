@@ -231,7 +231,7 @@
       <li>🧪 ‘더 실험해 보기’의 가상실험을 열어 보면 <b>+3 XP</b>, 모두 열면 <b>🧪 가상실험 탐험가 배지</b></li>
       <li>🎉 단계를 마치면 <b>+20 XP</b>와 <b>배지</b>, 한 번에 맞힌 비율만큼 <b>별(⭐ 최대 3개)</b></li>
       <li>📈 경험치가 쌓이면 레벨 업! 🌱 새싹 → 🧭 탐험가 → 🔬 연구원 → 🎓 박사 → 👑 마스터</li>
-      <li>🗂 위쪽 탭에서 <b>원하는 단계를 골라</b> 공부할 수 있어요. 끝낸 단계에는 ✔ 표시가 붙어요.</li>
+      <li>🔒 확인 문제를 모두 맞혀야 <b>다음 단계가 열려요</b>. 끝낸 단계에는 ✔ 표시가 붙고, 언제든 다시 열어 복습할 수 있어요.</li>
       <li>🏆 모든 단계와 종합 평가를 끝내면 <b>수료증</b>을 받아요!</li>
     </ul>
   </div>
@@ -1034,7 +1034,7 @@ $("bClose").onclick=()=>$("badgeModal").classList.remove("open");
 const lessons=[...document.querySelectorAll("section.lesson")];
 const LAST=lessons.length-1;
 const nav=$("nav"), navBtns=[];
-const unlocked=i=>true;   // 모든 단계를 자유롭게 열 수 있어요 (순서 잠금 없음)
+const unlocked=i=>TEACHER||i===0||!!state.done[i-1];   // 앞 단계를 마쳐야 다음 단계가 열려요 (선생님 모드는 모두 열림)
 lessons.forEach((s,i)=>{
   if(s.dataset.part){const p=document.createElement("span");p.className="part";p.textContent=s.dataset.part;nav.appendChild(p);}
   const b=document.createElement("button");
@@ -1062,8 +1062,8 @@ function go(i,stay){
   });
   const nb=$("nextBtn");
   $("prevBtn").disabled=i===0;
-  nb.disabled=i===LAST;
-  nb.textContent="다음 →";
+  nb.disabled=i===LAST||!unlocked(i+1);
+  nb.textContent=(i<LAST&&!unlocked(i+1))?"🔒 문제를 다 맞히면 열려요":"다음 →";
   updateBar(); save(); if(moved) report();
   if(!stay){navBtns[i].scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});window.scrollTo({top:0,behavior:"smooth"});}
 }
@@ -1739,7 +1739,7 @@ document.querySelectorAll(".sim").forEach((s,i)=>{
 function teacherMode(){
   if(!TEACHER) return;
   const ban=document.createElement("div"); ban.className="tbanner";
-  ban.textContent="👩‍🏫 선생님 모드 · 학생 기록과 따로 저장돼요";
+  ban.textContent="👩‍🏫 선생님 모드 · 모든 단계 열림 · 학생 기록과 따로 저장돼요";
   document.body.insertBefore(ban,document.body.firstChild);
   const p=document.createElement("div"); p.id="tpanel";
   p.innerHTML=`<div class="th" id="tHead"><span>👩‍🏫 선생님 도구</span><span id="tFold">▾</span></div>
